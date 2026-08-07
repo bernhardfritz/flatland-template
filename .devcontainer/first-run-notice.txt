@@ -1,0 +1,7 @@
+👋 Welcome to Flatland! Here are some tips to get you started:
+   - Open http://127.0.0.1:5173/ to see your animation
+   - Change main.go to trigger a browser refresh
+
+📖 Check out the README.md to see what scripts you can run.
+
+📚 Learn more at https://pkg.go.dev/github.com/bernhardfritz/flatland

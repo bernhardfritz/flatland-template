@@ -1,0 +1,51 @@
+name: Deploy
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  build:
+    # Specify runner +  build & upload the static files as an artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: bernhardfritz/setup-tinygo@v1
+        with:
+          go-version: '1.26.2'
+          tinygo-version: '0.41.1'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.19.0'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build static files
+        id: build
+        run: npm run build -- --base /${{ github.event.repository.name }}/
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v5 # or specific "vX.X.X" version tag for this action
+        with:
+          path: dist/
+  deploy:
+    if: github.ref == 'refs/heads/main'
+
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5 # or specific "vX.X.X" version tag for this action
+  
